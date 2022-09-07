@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import classNames from "classnames";
+import React from "react";
 import "components/InterviewerList.scss";
 import InterviewerListItem from "components/InterviewerListItem";
 
@@ -10,11 +9,10 @@ export default function InterviewerList(props) {
     return (
       <InterviewerListItem 
         key={interviewerArray.id}
-        id={interviewerArray.id}
         name={interviewerArray.name} 
         avatar={interviewerArray.avatar} 
         selected={interviewerArray.id === props.interviewer}
-        setInterviewer={props.setInterviewer}  
+        setInterviewer={() => {props.setInterviewer(interviewerArray.id)}}  
       />
     )
   });
