@@ -30,3 +30,17 @@ export function getInterview(state, interview) {
 
   return output;
 }
+
+export function getInterviewersForDay(state, day) {
+  const output = [];
+
+  for (const each of state.days) {
+    if (each.name === day) {
+      for (const elem of each.interviewers) {
+        output.push(state.interviewers[elem]);
+      }
+    }
+  }
+
+  return output;
+}

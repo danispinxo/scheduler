@@ -2,9 +2,15 @@ import React, { useState } from "react";
 import Button from "components/Button";
 import InterviewerList from "components/InterviewerList";
 
-export default function Form(props) {
-  const [student, setStudent] = useState(props.student || "");
-  const [interviewer, setInterviewer] = useState(props.interviewer || null);
+export default function Form({
+  student: preselectedStudent = "", 
+  interviewer: preselectedInterviewer = null, 
+  interviewers, 
+  onCancel, 
+  onSave
+}) {
+  const [student, setStudent] = useState(preselectedStudent);
+  const [interviewer, setInterviewer] = useState(preselectedInterviewer);
 
   const reset = () => {
     setStudent("");
@@ -13,11 +19,11 @@ export default function Form(props) {
 
   const cancel = () => {
     reset();
-    props.onCancel();
+    onCancel();
   }
 
   const save = () => {
-    props.onSave(student, interviewer);
+    onSave(student, interviewer);
   };
 
   return (
@@ -34,8 +40,8 @@ export default function Form(props) {
           />
         </form>
         <InterviewerList 
-          interviewers={props.interviewers}
-          interviewer={props.interviewer}
+          interviewers={interviewers}
+          interviewer={interviewer}
           value={interviewer}
           onChange={setInterviewer}
         />
