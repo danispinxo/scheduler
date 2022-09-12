@@ -21,11 +21,7 @@ export function getInterview(state, interview) {
 
   const output = {
     student: interview.student,
-    interviewer: {
-      id: interviewerId,
-      name: state.interviewers[interviewerId].name,
-      avatar: state.interviewers[interviewerId].avatar
-    }
+    interviewer: state.interviewers[interviewerId]
   };
 
   return output;

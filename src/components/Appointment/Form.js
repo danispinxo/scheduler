@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import Button from "components/Button";
 import InterviewerList from "components/InterviewerList";
 
-export default function Form({
-  student: preselectedStudent = "", 
-  interviewer: preselectedInterviewer = null, 
-  interviewers, 
-  onCancel, 
-  onSave
-}) {
+export default function Form(props) {
+  const {
+    student: preselectedStudent = "", 
+    interviewer: preselectedInterviewer = null, 
+    interviewers, 
+    onCancel
+  } = props;
   const [student, setStudent] = useState(preselectedStudent);
   const [interviewer, setInterviewer] = useState(preselectedInterviewer);
 
@@ -21,10 +21,6 @@ export default function Form({
     reset();
     onCancel();
   }
-
-  const save = () => {
-    onSave(student, interviewer);
-  };
 
   return (
     <main className="appointment__card appointment__card--create">
@@ -49,7 +45,7 @@ export default function Form({
       <section className="appointment__card-right">
         <section className="appointment__actions">
           <Button danger onClick={cancel}>Cancel</Button>
-          <Button confirm onClick={save}>Save</Button>
+          <Button confirm onClick={() => props.onSave(student, interviewer)}>Save</Button>
         </section>
       </section>
     </main>
