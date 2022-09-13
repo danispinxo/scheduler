@@ -86,7 +86,7 @@ export default function useApplicationData() {
   useEffect(() => {
     const socket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL || "ws://localhost:8001");
     socket.onopen = () => {
-      socket.send("ping");
+      // socket.send("ping");
     };
 
     socket.onmessage = (event) => {

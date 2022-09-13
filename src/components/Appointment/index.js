@@ -52,7 +52,6 @@ export default function Appointment(props) {
     transition(DELETING);
     onDelete(id)
       .then(() => {
-        console.log("Deleting");
         transition(EMPTY);
       })
       .catch(error => transition(ERROR_DELETE, true));
@@ -60,7 +59,7 @@ export default function Appointment(props) {
   }
 
   return (
-    <article className="appointment">
+    <article className="appointment" data-testid="appointment">
       <Header time={time} />
       {mode === EMPTY && <Empty onAdd={() => transition(CREATE)} />}
 
