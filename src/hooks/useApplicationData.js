@@ -7,7 +7,7 @@ const SET_INTERVIEW = "SET_INTERVIEW";
 
 function reducer(state, action) {
 
-  function calculateSpots(id, appointments) {
+  function calculateSpots(appointments) {
     const dayIndex = state.days.findIndex(day => state.day === day.name);
     const currentDay = state.days[dayIndex];
 
@@ -46,7 +46,7 @@ function reducer(state, action) {
         [id]: appointment,
       };
 
-      return { ...state, appointments, days: calculateSpots(id, appointments) };
+      return { ...state, appointments, days: calculateSpots(appointments) };
 
     default:
       throw new Error(
@@ -84,7 +84,7 @@ export default function useApplicationData() {
   }, []);
 
   useEffect(() => {
-    const socket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
+    const socket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL || "ws://localhost:8001");
     socket.onopen = () => {
       socket.send("ping");
     };
