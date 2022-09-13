@@ -1,64 +1,128 @@
-import {useState, useEffect} from "react";
+import {useReducer, useEffect} from "react";
 import axios from "axios";
 
+const SET_DAY = "SET_DAY";
+const SET_APPLICATION_DATA = "SET_APPLICATION_DATA";
+const SET_INTERVIEW = "SET_INTERVIEW";
+
+function reducer(state, action) {
+
+  function calculateSpots(id, appointments) {
+    const dayIndex = state.days.findIndex(day => state.day === day.name);
+    const currentDay = state.days[dayIndex];
+
+    const spots = currentDay.appointments.filter(appointmentId => !appointments[appointmentId].interview).length;
+
+    const day = {...state.days[dayIndex], spots}
+    const days = [...state.days];
+    days[dayIndex] = day;
+
+    return days;
+  }
+
+  switch (action.type) {
+
+    case SET_DAY:
+      return { ...state, day: action.day };
+
+    case SET_APPLICATION_DATA:
+      return {
+        ...state,
+        days: action.days,
+        appointments: action.appointments,
+        interviewers: action.interviewers,
+      };
+
+    case SET_INTERVIEW:
+      const { id, interview } = action;
+
+      const appointment = {
+        ...state.appointments[id],
+        interview,
+      };
+
+      const appointments = {
+        ...state.appointments,
+        [id]: appointment,
+      };
+
+      return { ...state, appointments, days: calculateSpots(id, appointments) };
+
+    default:
+      throw new Error(
+        `Tried to reduce with unsupported action type: ${action.type}`
+      );
+  }
+}
+
 export default function useApplicationData() {
-  const [state, setState] = useState({
+  const [state, dispatch] = useReducer(reducer, {
     day: "Monday",
     days: [],
     appointments: {},
-    interviewers: {}
+    interviewers: {},
   });
-  
-  useEffect(() => {Promise.all([
-    axios.get('/api/days'),
-    axios.get('/api/appointments'),
-    axios.get('/api/interviewers')
-  ]).then((all) => {
-    setState(prev => ({...prev, days: [...all[0].data], appointments: all[1].data, interviewers: all[2].data }));
-  })}, [state.day]);
-  
-  const setDay = day => setState({ ...state, day });
-  
-  function bookInterview(id, interview) {
-    const appointment = {
-      ...state.appointments[id],
-      interview: { ...interview }
+
+  const setDay = (day) => dispatch({ type: SET_DAY, day });
+
+  useEffect(() => {
+    Promise.all([
+      axios.get("/api/days"),
+      axios.get("/api/appointments"),
+      axios.get("/api/interviewers"),
+    ]).then((all) => {
+      const days = all[0].data;
+      const appointments = all[1].data;
+      const interviewers = all[2].data;
+      dispatch({
+        type: SET_APPLICATION_DATA,
+        days,
+        appointments,
+        interviewers,
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    const socket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
+    socket.onopen = () => {
+      socket.send("ping");
     };
-  
-    const appointments = {
-      ...state.appointments,
-      [id]: appointment
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log("Message received: ", event.data);
+
+      if (typeof data === "object" && data.type === "SET_INTERVIEW") {
+        dispatch(data);
+      }
     };
+
+    return () => socket.close();
+
+  }, [dispatch]);
   
-    return axios.put(`/api/appointments/${id}`, {interview})
+  const bookInterview = (id, interview) => {
+    return axios.put(`/api/appointments/${id}`, { interview })
       .then((res) => {
-        console.log(res);
-  
-        setState({
-          ...state,
-          appointments
+        dispatch({
+          type: SET_INTERVIEW,
+          id,
+          interview,
         });
-  
-      })
-  
+      });
   };
   
-  function cancelInterview(id) {
-    const appointment = {
-      ...state.appointments[id],
-      interview: null
-    };
-  
+  const cancelInterview = (id) => {
     return axios.delete(`/api/appointments/${id}`)
       .then((res) => {
-        console.log(res);
-        
-        setState({
-          ...state,
-          appointment
+        dispatch({
+          type: SET_INTERVIEW,
+          id,
+          interview: null,
         });
-      })
-  };
-  
+      });
+    };
+
   return { state, setDay, bookInterview, cancelInterview }
 }

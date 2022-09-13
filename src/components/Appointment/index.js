@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "components/Appointment/styles.scss";
+import useVisualMode from "hooks/useVisualMode";
 import Header from "./Header";
 import Show from "./Show";
 import Empty from "./Empty";
 import Form from "./Form";
 import Status from "./Status";
-import useVisualMode from "hooks/useVisualMode";
 import Confirm from "./Confirm";
 import Error from "./Error";
 
@@ -25,6 +25,15 @@ export default function Appointment(props) {
     interview ? SHOW : EMPTY
   );
 
+  useEffect(() => {
+    if (interview && mode === EMPTY) {
+     transition(SHOW);
+    }
+    if (interview === null && mode === SHOW) {
+     transition(EMPTY);
+    }
+   }, [interview, transition, mode]);
+
   function save(name, interviewer) {
     const interview = {
       student: name,
@@ -39,10 +48,6 @@ export default function Appointment(props) {
       .catch(error => transition(ERROR_SAVE, true));
   }
 
-  function confirmDelete() {
-    transition(CONFIRM);
-  }
-
   function deleteInterview() {
     transition(DELETING);
     onDelete(id)
@@ -52,10 +57,6 @@ export default function Appointment(props) {
       })
       .catch(error => transition(ERROR_DELETE, true));
 
-  }
-
-  function onEdit() {
-    transition(EDIT)
   }
 
   return (
@@ -79,8 +80,8 @@ export default function Appointment(props) {
         <Show
           student={interview.student}
           interviewer={interview.interviewer}
-          onDelete={() => confirmDelete()}
-          onEdit={() => onEdit()}
+          onDelete={() => transition(CONFIRM)}
+          onEdit={() => transition(EDIT)}
         />
       )}
 
