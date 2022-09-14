@@ -18,7 +18,9 @@ Install dependencies with `npm install`.
 
 ## Screenshots
 
-![]()
+![Screenshot of the Schedule](https://github.com/danispinxo/scheduler/blob/master/public/images/schedule.png)
+![Screenshot of Booking an Appointment](https://github.com/danispinxo/scheduler/blob/master/public/images/book.png)
+![Screenshot of Deleting an Appointment](https://github.com/danispinxo/scheduler/blob/master/public/images/delete.png)
 
 ## Features
 
