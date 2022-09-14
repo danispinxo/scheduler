@@ -36,13 +36,9 @@ export default function useApplicationData() {
 
   useEffect(() => {
     const socket = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL || "ws://localhost:8001");
-    socket.onopen = () => {
-      // socket.send("ping");
-    };
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log("Message received: ", event.data);
 
       if (typeof data === "object" && data.type === "SET_INTERVIEW") {
         dispatch(data);
@@ -75,5 +71,5 @@ export default function useApplicationData() {
       });
     };
 
-  return { state, setDay, bookInterview, cancelInterview }
+  return { state, setDay, bookInterview, cancelInterview };
 }

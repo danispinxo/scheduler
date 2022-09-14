@@ -29,7 +29,7 @@ export default function Appointment(props) {
     if (interview && mode === EMPTY) {
      transition(SHOW);
     }
-    if (interview === null && mode === SHOW) {
+    if (!interview && mode === SHOW) {
      transition(EMPTY);
     }
    }, [interview, transition, mode]);
@@ -45,7 +45,7 @@ export default function Appointment(props) {
       .then(() => {
         transition(SHOW);
       })
-      .catch(error => transition(ERROR_SAVE, true));
+      .catch(() => transition(ERROR_SAVE, true));
   }
 
   function deleteInterview() {
@@ -54,7 +54,7 @@ export default function Appointment(props) {
       .then(() => {
         transition(EMPTY);
       })
-      .catch(error => transition(ERROR_DELETE, true));
+      .catch(() => transition(ERROR_DELETE, true));
 
   }
 
